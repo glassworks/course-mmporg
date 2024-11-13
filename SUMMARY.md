@@ -4,15 +4,19 @@
 
 ## Game types
 
-* [2 player pong](games/pong-2-player.md)
 * [Massive player pong](games/pong-massive.md)
 * [My MetaVerse](games/meta-verse.md)
 
 ## Networking
 
 * [Architecture](networking/architecture.md)
-* [UDP Messaging](networking/udp.md)
+* [Topologies](networking/introduction.md)
+* [La pile TCP/IP](networking/tcp-ip.md)
+* [Routing](networking/routing.md)
+* [TCP et UDP](networking/transport.md)
 * [TCP Messaging](networking/tcp.md)
+* [UDP Messaging](networking/udp.md)
+
 
 ## Unity
 
