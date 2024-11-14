@@ -1,143 +1,148 @@
 # Architecture
 
-You will need to conceive an architecture for your networked game.
+Vous devrez concevoir une architecture pour votre jeu en réseau.
 
-For this exercise, you will most likely use a client-server approach. (Peer-to-peer connections may also be used, but are more difficult to handle for massively online games).
+Pour cet exercice, vous utiliserez très probablement une approche client-serveur. (Les connexions peer-to-peer peuvent également être utilisées, mais elles sont plus difficiles à gérer pour les jeux massivement en ligne).
 
-In a client-server approach, you will typically develop 2 different applications :
+Dans une approche client-serveur, vous développerez généralement 2 applications différentes :
 
-## A server application
+## Une application serveur
 
-This application stores the global state of the game. This means it will store an internal representation of data such as :
+Cette application stocke l'état global du jeu. Cela signifie qu'elle stocke une représentation interne de données telles que :
 
-- The transform (position, rotation, scale) of objects
-- Parameters concerning dynamic objects
-- Contents of the scene
-- Scoring, life, inventory, ...
+- La transformation (position, rotation, échelle) des objets.
+- Les paramètres concernant les objets dynamiques
+- Le contenu de la scène
+- Le score, la vie, l'inventaire, ...
 - ...
 
-The application starts by listening on a specific port, and accept incoming connections (if TCP) or datagrams (if UDP).
+L'application commence par écouter sur un port spécifique, et accepte les connexions entrantes (si TCP) ou les datagrammes (si UDP).
 
-When it updates its internal state, it should broadcast (or multi-cast, or send individual messages) about the updated state to connected clients.
+Lorsqu'elle met à jour son état interne, elle doit diffuser (ou multidiffuser, ou envoyer des messages individuels) l'état mis à jour aux clients connectés.
 
-The server application can be headless (that is, no graphical interface) or also have a rendering component for rendering a centralised view of the game.
+L'application serveur peut être sans tête (c'est-à-dire sans interface graphique) ou comporter un composant de rendu pour afficher une vue centralisée du jeu.
 
-## A client application
 
-A client application typically needs the IP address and port of the server in order to function.
+## Une application client
 
-1. The IP address is manually entered, or automatically discovered via protocols such as Bonjour (Apple).
-2. The client establishes a connection to the server.
-3. The server sends the current state to the client
-4. The client updates its own internal state accordinly
-5. The client starts rendering the scene to the user's screen, accepting user interactions
+Une application cliente a généralement besoin de l'adresse IP et du port du serveur pour fonctionner.
 
-Depending on the game, the client application may receive many update messages from the server, updating the internal state on the client.
+1. L'adresse IP est saisie manuellement ou découverte automatiquement via des protocoles tels que Bonjour (Apple).
+2. Le client établit une connexion avec le serveur.
+3. Le serveur envoie l'état actuel au client
+4. Le client met à jour son propre état interne en conséquence.
+5. Le client commence à rendre la scène sur l'écran de l'utilisateur, en acceptant les interactions de l'utilisateur.
 
-The client may also send many update versions to the server, specifically concerning objects that the client directly controls (typically the user's avatar). The client may also send **commands** to the server (or Remote Procedure Calls (RPC)) that will trigger some game-logic directly on the server.
+En fonction du jeu, l'application cliente peut recevoir de nombreux messages de mise à jour de la part du serveur, mettant à jour l'état interne du client.
 
-## Synchronisation paradigms
+Le client peut également envoyer de nombreuses versions de mise à jour au serveur, notamment en ce qui concerne les objets qu'il contrôle directement (généralement l'avatar de l'utilisateur). Le client peut également envoyer des **commandes** au serveur (ou des appels de procédure à distance (RPC)) qui déclencheront une certaine logique de jeu directement sur le serveur.
 
-The game you will be developing is a real-time 3D application. This means there will be 3D objects that are continously moving, or are changing position as a result of user interactions. The objective is to ensure that all participating users see (approximately) the same version of the game at all times.
 
-The strategy you use for synchronising your clients and your server depend on many factors that are specific to your game and your deployment:
+## Paradigmes de synchronisation
 
-- anticipated bandwidth available (is it a local connection via a LAN ? Is it over the Internet)
-- the number of simultaneous connectionx
-- networking conditions and latency
-- the level of accuracy required
+Le jeu que vous allez développer est une application 3D en temps réel. Cela signifie qu'il y aura des objets 3D qui se déplacent continuellement ou qui changent de position en fonction des interactions de l'utilisateur. L'objectif est de s'assurer que tous les utilisateurs participants voient (approximativement) la même version du jeu à tout moment.
+
+La stratégie que vous utilisez pour synchroniser vos clients et votre serveur dépend de nombreux facteurs spécifiques à votre jeu et à votre déploiement :
+
+- la largeur de bande disponible anticipée (s'agit-il d'une connexion locale via un réseau local ? s'agit-il d'une connexion via l'internet)
+- le nombre de connexions simultanées
+- les conditions du réseau et la latence
+- le niveau de précision requis
 - ...
 
-### The dumb client
 
-The simplest strategy is to control the entire state on the server. The server sends position/rotation information for all dynamic objects to all clients at a high frequency. 
+### Le client muet
 
-The client therefore performs no real state updates. It just receives and updates its internal state based on what it receives from the server.
+La stratégie la plus simple consiste à contrôler l'ensemble de l'état sur le serveur. Le serveur envoie des informations sur la position et la rotation de tous les objets dynamiques à tous les clients à une fréquence élevée. 
+
+Le client n'effectue donc aucune mise à jour réelle de l'état. Il se contente de recevoir et de mettre à jour son état interne en fonction de ce qu'il reçoit du serveur.
 
 ![](../graphics/dumbclient.png)
 
-But how to users interact with the game? Typically user interactions are translated into commands that are relayed to the server. The server interprets the command and updates the state. This state will eventually be updated at all clients.
+Mais comment les utilisateurs interagissent-ils avec le jeu ? En général, les interactions de l'utilisateur sont traduites en commandes qui sont transmises au serveur. Le serveur interprète la commande et met à jour l'état. Cet état sera finalement mis à jour par tous les clients.
 
 ![](../graphics/dumbclient-command.png)
 
-This approach has a number of advantages :
+Cette approche présente un certain nombre d'avantages :
 
-- simple to implement
-- the server also has the final say on how to interpret a command and update the state
-- race conditions can be handled on a first-come, first-serve basis
+- elle est simple à mettre en œuvre
+- le serveur a également le dernier mot sur la manière d'interpréter une commande et de mettre à jour l'état
+- les conditions de course peuvent être gérées selon le principe du premier arrivé, premier servi.
 
-However, there can be some serious disadvantages :
+Cependant, elle peut présenter de sérieux inconvénients :
 
-- The server needs to send a lot of messages to a lot of clients (at least 30 messages per second to maintain the illusion of animation). It will need a very large bandwidth to do this, and does not scale well.
-- Users often feel the latency between their input and the final result appearing on the screen. They have to wait for the command to reach the server, be processed and for the next update to arrive from the server.
+- Le serveur doit envoyer beaucoup de messages à un grand nombre de clients (au moins 30 messages par seconde pour maintenir l'illusion de l'animation). Il aura besoin d'une très grande bande passante pour ce faire, et n'est pas bien adapté.
+- Les utilisateurs ressentent souvent la latence entre leur entrée et le résultat final apparaissant à l'écran. Ils doivent attendre que la commande parvienne au serveur, qu'elle soit traitée et que la prochaine mise à jour arrive du serveur.
 
 {% hint style="info" %}
 
-It may be possibly to reduce bandwidth usage using a number of heuristics. For example, we only send updates if an object has moved, or is moving. However, this may create other problems for clients that may not have received the last update message for an object.
+Il est possible de réduire l'utilisation de la bande passante à l'aide d'un certain nombre d'heuristiques. Par exemple, nous n'envoyons des mises à jour que si un objet s'est déplacé ou est en train de se déplacer. Cependant, cela peut créer d'autres problèmes pour les clients qui n'ont pas reçu le dernier message de mise à jour pour un objet.
 
-Another strategy would be to send update messages only for objects within the vicinity (or view) of a client. You would however need to manage how to tell the server where your camera is, and what it is looking at, and also how to update stale state that may come back into view.
+Une autre stratégie consisterait à n'envoyer des messages de mise à jour que pour les objets se trouvant à proximité (ou en vue) d'un client. Vous devrez cependant gérer la façon d'indiquer au serveur où se trouve votre caméra et ce qu'elle regarde, ainsi que la façon de mettre à jour l'état périmé qui peut revenir à la vue.
 
 {% endhint %}
 
-### Client with local control
 
-One strategy to avoid latency for a user is to take control, on the client, of the objects the user controls.
+### Client avec contrôle local
 
-The idea is that part of the state is "owned" by the client. The client then is the one that sends regular updates about its own objects to the server, or even perhaps directly to other clients.
+Une stratégie permettant d'éviter la latence pour un utilisateur consiste à prendre le contrôle, sur le client, des objets contrôlés par l'utilisateur.
+
+L'idée est qu'une partie de l'état est « détenue » par le client. C'est alors le client qui envoie des mises à jour régulières de ses propres objets au serveur, voire directement à d'autres clients.
 
 ![](../graphics/localcontrol.png)
 
-The server updates its internal state, and broadcasts the update to the other clients.
+Le serveur met à jour son état interne et diffuse la mise à jour aux autres clients.
 
-The major advantage of this approach is that the user immediately sees results of his actions, without waiting for the response from the server, allowing for a much more fluid experience.
+Le principal avantage de cette approche est que l'utilisateur voit immédiatement les résultats de ses actions, sans attendre la réponse du serveur, ce qui permet une expérience beaucoup plus fluide.
 
 {% hint style="info" %}
 
-This is absolutely crucial for any VR or AR experience, where latency between an interaction and the visual result can cause nausea.
+Ceci est absolument crucial pour toute expérience VR ou AR, où la latence entre une interaction et le résultat visuel peut provoquer des nausées.
 
 {% endhint %}
 
-But can you see the difficulty with this approach ?
+Mais voyez-vous la difficulté de cette approche ?
 
-What if two different users both touch a "bonus" in the world on their local machines. Technically they both earn a point. But the bonus can only be accorded to one of the players. The server would have to decide who is the winner, and one of the players will end up not earning a point, even though visually he saw himself getting the point!
+Que se passe-t-il si deux utilisateurs différents touchent tous deux un « bonus » dans le monde sur leurs machines locales. Techniquement, ils gagnent tous les deux un point. Mais le bonus ne peut être accordé qu'à l'un des deux joueurs. Le serveur devra décider qui est le gagnant, et l'un des joueurs finira par ne pas gagner de point, même si, visuellement, il s'est vu gagner le point !
 
 
-### Parameterisation
+### Paramétrage
 
-One solution to avoid sending many update messages would be to rather send the parameters of the movement to all clients at the start of a movement, and let each client calculate and update its internal state locally.
+Une solution pour éviter d'envoyer de nombreux messages de mise à jour serait d'envoyer les paramètres du mouvement à tous les clients au début d'un mouvement, et de laisser chaque client calculer et mettre à jour son état interne localement.
 
 ![](../graphics/parameterisation.png)
 
-This is a huge saving in terms of bandwidth, since now we only need to send one message with the parameters for the movement (such as speed, direction, acceleration, etc.), and each client implements the algorithm locally.
+Il s'agit d'une économie considérable en termes de bande passante, puisque nous n'avons plus qu'à envoyer un message contenant les paramètres du mouvement (vitesse, direction, accélération, etc.), et que chaque client implémente l'algorithme localement.
 
-However, this is the most difficult to control, especially given variable latency between the client that emits the initial command and the starting time on the server and each client. Indeed, even half a second delay can cause objects to end up at wildly differing positions on the different clients!
+Cependant, c'est l'aspect le plus difficile à contrôler, notamment en raison de la latence variable entre le client qui émet la commande initiale et l'heure de démarrage sur le serveur et chaque client. En effet, même un décalage d'une demi-seconde peut faire en sorte que les objets se retrouvent à des positions très différentes sur les différents clients !
 
-### Reckoning algorithms
+### Algorithmes de recalage (reckoning)
 
-To get around the problem of clients getting out of sync by combining regular (but less frequent) updates with parameterisation.
+Pour contourner le problème de la désynchronisation des clients en combinant des mises à jour régulières (mais moins fréquentes) avec la paramétrisation.
 
-The idea is that objects continue to move locally until the client receives an update that corrects its state. 
+L'idée est que les objets continuent à se déplacer localement jusqu'à ce que le client reçoive une mise à jour qui corrige son état. 
 
-We count on the fact that for the majority of objects, the error will be minimal, and that the corrections barely visible to the user.
+Nous comptons sur le fait que pour la majorité des objets, l'erreur sera minime, et que les corrections seront à peine visibles pour l'utilisateur.
 
 {% hint style="info" %}
 
-Have you ever seen characters suddenly "teleport" from one position to another in your online games? It is a result of a paramterised error, finally resolved by an update!
+Avez-vous déjà vu des personnages se « téléporter » soudainement d'une position à une autre dans vos jeux en ligne ? C'est le résultat d'une erreur de paramétrage, enfin résolue par une mise à jour !
 
 {% endhint %}
 
-[Dead reckoning](https://en.wikipedia.org/wiki/Dead_reckoning) in fact, is a technique used in navigation, robotics and networked games to try and anticipate the movement of objects based on their current parameters, and smoothly transition to the updated (correct) position when an update arrives.
+En fait, [Dead reckoning](https://en.wikipedia.org/wiki/Dead_reckoning) est une technique utilisée dans la navigation, la robotique et les jeux en réseau pour essayer d'anticiper le mouvement des objets sur la base de leurs paramètres actuels, et de passer en douceur à la position mise à jour (correcte) lorsqu'une mise à jour arrive.
 
 ![](../graphics/reckoning.png)
 
-## Messaging
 
-Given this knowledge you can start to model the architecture of your game. You know you will need at least two applications, a server and a client. They will need to communicate with each other. But how ?
+## Messagerie
 
-Your typical HTTP request will not do for this architecture. As you can see, the server is actively pushing updates to each client!
+Compte tenu de ces connaissances, vous pouvez commencer à modéliser l'architecture de votre jeu. Vous savez que vous aurez besoin d'au moins deux applications, un serveur et un client. Elles devront communiquer entre elles. Mais comment ?
 
-If you have used them before, you may be thinking about web-sockets... and you are on the right track. The idea of a web-socket is that we maintain an open connection between a client and server, so that the server can send data back to the client in real-time.
+Une requête HTTP classique ne suffira pas pour cette architecture. Comme vous pouvez le voir, le serveur envoie activement des mises à jour à chaque client !
 
-But why add the overhead of "web"-sockets, when we can just use plain old sockets!
+Si vous les avez déjà utilisées, vous pensez peut-être aux sockets web... et vous êtes sur la bonne voie. L'idée d'un web-socket est de maintenir une connexion ouverte entre un client et un serveur, de sorte que le serveur puisse renvoyer des données au client en temps réel.
 
-For this project, we will move down the network stack and work directly with TCP or UDP to implement our synchronisation!
+Mais pourquoi ajouter la surcharge des sockets « web », alors que nous pouvons simplement utiliser de simples sockets !
+
+Pour ce projet, nous allons descendre dans la pile réseau et travailler directement avec TCP ou UDP pour implémenter notre synchronisation !

@@ -1,47 +1,53 @@
+---
+cover: >-
+  https://images.unsplash.com/photo-1515922912707-dbc512030899?crop=entropy&cs=srgb&fm=jpg&ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw4fHxzcGhlcmV8ZW58MHx8fHwxNzI5MzA4NTk3fDA&ixlib=rb-4.0.3&q=85
+coverY: 0
+---
+
 # Jeu MMP(O)RG
 
-Have your ever wondered how online multi-player games work ? You have probably never asked yourself that question, but indeed there are many challenges to this problem :
+Vous êtes-vous déjà demandé comment fonctionnent les jeux multi-joueurs en ligne ? Vous ne vous êtes probablement jamais posé cette question, mais il y a en effet de nombreux défis à relever pour résoudre ce problème :
 
-- How can I be sure that I am seeing the same thing as the other players ?
-- What about network latency ?
-- If two people both recover a bonus object in the game at the same time, who wins ?
-- How do we persist the state of the world if a player leaves and comes back ?
-- What is the best and most efficient way to communicate between different instances of the game ?
+- Comment puis-je être sûr que je vois la même chose que les autres joueurs ?
+- Qu'en est-il de la latence du réseau ?
+- Si deux personnes récupèrent en même temps un objet bonus dans le jeu, qui gagne ?
+- Comment maintenir l'état du monde si un joueur quitte le jeu et y revient ?
+- Quel est le meilleur moyen de communiquer entre les différentes instances du jeu ?
 - ...
 
-## The problem
+## Le problème
 
-If you have arrived at this level in your studies, it means you have mastered typical client-server architectures that send HTTP requests to a backend (possibly an API). The request is handled by the server, and a response is sent to the client. You may have even played with other types of connection paradigms such as *socket.io*.
+Si vous êtes arrivé à ce niveau de vos études, cela signifie que vous maîtrisez les architectures client-serveur typiques qui envoient des requêtes HTTP à un backend (éventuellement une API). La requête est traitée par le serveur et une réponse est envoyée au client. Vous avez peut-être même joué avec d'autres types de paradigmes de connexion tels que *socket.io*.
 
-However, the architecture typically employed is *client-server*. A single all powerful "server" that is the final source of truth for your platform. 
+Cependant, l'architecture généralement employée est *client-serveur*. Un seul « serveur » tout puissant qui est la source finale de vérité pour votre plateforme. 
 
-If this server disappears, then typically the rest of your architecture does not have enough knowledge to continue to function. These days, we invest a lot of time and money in ensuring that this server remains alive, reachable and that it responds within a reasonable delay. Solutions include cloud based redundant deployments, load-balancing, failovers, kubernetes, ...
+Si ce serveur disparaît, le reste de l'architecture ne dispose généralement pas de suffisamment de connaissances pour continuer à fonctionner. De nos jours, nous investissons beaucoup de temps et d'argent pour nous assurer que ce serveur reste en vie, qu'il est joignable et qu'il répond dans un délai raisonnable. Les solutions incluent des déploiements redondants basés sur le cloud, l'équilibrage de charge, les basculements, kubernetes, ...
 
-Sometimes, however, the model of *request-processing-response* is not very pertinent, and can even be overly burdensome for the application in multiple dimensions :
+Parfois, cependant, le modèle *requête-traitement-réponse* n'est pas très pertinent, et peut même être trop lourd pour l'application dans de multiples dimensions :
 
-- The server (or server architecture) cannot handle the quantity of requests 
-- The available bandwidth is just not enough to carry all required traffic.
+- Le serveur (ou l'architecture du serveur) ne peut pas gérer la quantité de demandes. 
+- La bande passante disponible n'est tout simplement pas suffisante pour acheminer tout le trafic nécessaire.
 
-A typical example of such a scenario is a networked or online game. In this scenario, we are faced with a *real-time* problem, where state needs to be synchronised multiple times per second. Is the traditional model still applicable in the scenario ?
+Un exemple typique d'un tel scénario est celui d'un jeu en réseau ou en ligne. Dans ce scénario, nous sommes confrontés à un problème de  temps réel, où l'état doit être synchronisé plusieurs fois par seconde. Le modèle traditionnel est-il toujours applicable dans ce scénario ?
 
-Add to this scenario the problem of real-time interactions vs. network latency. Two players on opposite sides of the world are participating in the same online game. Both shoot an arrow at a target at exactly the same time. However, due to network latency problems, one player will win, will the other loses. Who decides who is the winner ? 
+Ajoutez à ce scénario le problème des interactions en temps réel par rapport à la latence du réseau. Deux joueurs situés à l'autre bout du monde participent au même jeu en ligne. Tous deux tirent une flèche sur une cible exactement au même moment. Cependant, en raison de problèmes de latence du réseau, l'un des joueurs gagne, tandis que l'autre perd. Qui décide qui est le gagnant ? 
 
-What if we want to animate the arrow's trajectory ? It would be way too costly and slow to send each step of the arrow's movement to every player in the game. Typically, the arrow's trajectory would be calculated on each player's computer. However, due to latency problems, my arrow may reach the target first on my machine, but in reality another player's arrow reached it first. We have created a paradox. How do we get out of it ?
+Et si nous voulions animer la trajectoire de la flèche ? Il serait beaucoup trop coûteux et lent d'envoyer chaque étape du mouvement de la flèche à chaque joueur du jeu. Typiquement, la trajectoire de la flèche serait calculée sur l'ordinateur de chaque joueur. Cependant, en raison de problèmes de latence, ma flèche peut atteindre la cible en premier sur mon ordinateur, mais en réalité, c'est la flèche d'un autre joueur qui l'a atteinte en premier. Nous avons créé un paradoxe. Comment en sortir ?
 
-These problems are not easy to solve, and often we have to tailor our solution to the type of game we are developing, according to what each player can see, and how objects move in the game.
+Ces problèmes ne sont pas faciles à résoudre, et nous devons souvent adapter notre solution au type de jeu que nous développons, en fonction de ce que chaque joueur peut voir et de la façon dont les objets se déplacent dans le jeu.
 
-## Objectives
+## Objectifs
 
-As a software engineer, especially one specializing in the web, it is important to be exposed to engineering problems beyong the typical client-server web-request paradigm. During your career, you will be asked to model and develop solutions that is outside this familiar zone, possibly using paradigms, languages, platforms or architectures to which you are unfamiliar. 
+En tant qu'ingénieur logiciel, en particulier spécialisé dans le web, il est important d'être exposé à des problèmes d'ingénierie qui dépassent le paradigme client-serveur web-requête typique. Au cours de votre carrière, on vous demandera de modéliser et de développer des solutions qui sortent de cette zone familière, en utilisant éventuellement des paradigmes, des langages, des plates-formes ou des architectures qui ne vous sont pas familiers. 
 
-This course therefore has a number of objectives, aimed at reinforcing your toolset with the following elements :
+Ce cours a donc un certain nombre d'objectifs, visant à renforcer votre boîte à outils avec les éléments suivants :
 
-- Understand and appreciate network topologies, and alternatives (client-server, peer-to-peer, ...)
-- Become familiar with the two principle transport layer protocols, TCP and UDP, and understand their advantages and disadvantages
-- Learn a new programming paradigm through the use of an industry standard game-engine, Unity 3D, and understand the notion of the animation loop, and how to animate real-time interactive experiences
-- Learn a new programming language, C#, and become familiar with object oriented programming
-- Design and implement a custom protocol that is pertinent to your game
-- Be confronted by network related implementation and optimisation problems
+- Comprendre et apprécier les topologies de réseau, et les alternatives (client-serveur, pair-à-pair, ...)
+- Se familiariser avec les deux principaux protocoles de la couche transport, TCP et UDP, et comprendre leurs avantages et inconvénients.
+- Apprendre un nouveau paradigme de programmation à travers l'utilisation d'un moteur de jeu standard, Unity 3D, et comprendre la notion de boucle d'animation, et comment animer des expériences interactives en temps réel.
+- Apprendre un nouveau langage de programmation, C#, et se familiariser avec la programmation orientée objet
+- Concevoir et mettre en œuvre un protocole personnalisé pertinent pour votre jeu
+- Être confronté à des problèmes d'implémentation et d'optimisation liés au réseau.
 
 Il s'agit d'un projet de groupe, et par conséquent, en tant que futur Tech-Lead/CTO, vous devrez également pratiquer et affiner vos compétences non techniques, mais néanmoins essentielles :
 
@@ -50,38 +56,58 @@ Il s'agit d'un projet de groupe, et par conséquent, en tant que futur Tech-Lead
 - révision du code entre collègues
 
 
+## Le projet : un jeu massivement multijoueur
 
-## The project : a massively multiplayer game
+Votre mission pour cette semaine est de créer un jeu en temps réel **massivement multi-joueurs** en utilisant [Unity3D](https://unity.com/fr), un moteur de jeu populaire pour créer des jeux 2D et 3D.
 
-Your mission for this week is to create a massively multi-player real-time game using [Unity3D](https://unity.com/fr), a popular game-engine for creating 2D and 3D games.
+Qu'est-ce que j'entends par **massivement**? Je veux dire que votre jeu doit être capable de gérer **plus de quatre joueurs simultanés** !
 
-What do I mean by **massively** ? I mean, your game should be able to handle more than four concurrent players at any one time!
+Je vous ai fourni un [projet de base Unity avec des demos ici](https://github.com/glassworks/course-mmporg-sample).
 
-You have three options for your game :
+Vous avez trois options pour votre jeu :
 
-- **MMPong** : the Unity project sample I have provided includes a demo 2 player Pong game (in `Assets/Demos/Pong/Pong.unity`). Currently we control the two paddles using Z and S (left player) and the up and down arrow (right player). Your mission is to transform this into a massively multiplayer version. One idea could be the following : players from the same promo connect and specify if they are on the left or right hand side of the classroom. The more players that participate simultaneously, the more the game responds accordingly. For example, the more players on the left there are that push the up arrow simultaneously, the quicker the left paddle ascends in the game.
+- **MMPong**: l'exemple de projet Unity que j'ai fourni inclut une démo de jeu de Pong à 2 joueurs (dans `Assets/Demos/Pong/Pong.unity`). Actuellement, nous contrôlons les deux pagaies en utilisant Z et S (joueur gauche) et les flèches haut et bas (joueur droit). Votre mission est de transformer ce jeu en une version massivement multijoueur. Une idée pourrait être la suivante : les joueurs de la même promotion se connectent et précisent s'ils se trouvent à gauche ou à droite de la salle de classe. Plus il y a de joueurs qui participent simultanément, plus le jeu réagit en conséquence. Par exemple, plus il y a de joueurs à gauche qui appuient simultanément sur la flèche vers le haut, plus la palette de gauche monte rapidement dans le jeu.
 
-- **MetaVerse** : the Unity project sample I have provided includes a demo **sims** simulation (in `Assets/Demos/MetaVerse/MetaVerse.unity`). Currently we control the two characters using Z/S/Q/D keys (left player) and the arrow-keys (right player). Your mission is to transform this scene into a multiplayer experience where players can join and leave, interact with objects (collect bonuses or maluses, move objects, etc.). Each user of the game should be able to see an accurate view of the scene and what the others are doing. Don't forget to synchronise the state of the world between players too!
+-  MetaVerse**: l'exemple de projet Unity que j'ai fourni inclut une simulation **sims** de démonstration (dans `Assets/Demos/MetaVerse/MetaVerse.unity`). Actuellement, nous contrôlons les deux personnages en utilisant les touches Z/S/Q/D (joueur gauche) et les touches fléchées (joueur droit). Votre mission est de transformer cette scène en une expérience multijoueur où les joueurs peuvent se rejoindre et se quitter, interagir avec les objets (collecter des bonus ou des malus, déplacer des objets, etc.) Chaque utilisateur du jeu doit pouvoir avoir une vue précise de la scène et de ce que font les autres. N'oubliez pas non plus de synchroniser l'état du monde entre les joueurs !
 
-- **Your choice** : You are also free to create your own multiplayer game. However, your game must provide for >4 simultaneous players over a network. If you choose this option, you will need to validate your project with me first.
+- **Votre choix**: Vous êtes également libre de créer votre propre jeu multijoueur. Cependant, votre jeu doit prévoir >4 joueurs simultanés sur un réseau. Si vous choisissez cette option, vous devrez d'abord valider votre projet avec moi.
 
-There is one major constraint for this project : you must build your own native protocol over TCP or UDP. **You may not use built in Unity networking tools, plugins or packages, or any other extension from the Asset Store or elsewhere**
+Il y a une contrainte majeure pour ce projet : vous devez construire votre propre protocole natif sur TCP ou UDP. **Vous ne pouvez pas utiliser les outils de réseau intégrés à Unity, les plugins ou les packages, ou toute autre extension provenant de l'Asset Store ou d'ailleurs**.
+
+Vous vous sentez un peu perdu, ou vous ne savez pas par où commencer ? Heureusement, je vous propose quelques points de départ !
+
+- La mise en réseau
+  - [Comment concevoir une architecture de jeu](./networking/architecture.md)
+  - [Introduction à la mise en réseau](./networking/introduction.md)
+  - [Exemples TCP](./networking/tcp.md)
+  - [Exemples UDP](./networking/udp.md)
+- [Une introduction à Unity](./unity/basics.md)
+- [Un projet de démonstration](https://github.com/glassworks/course-mmporg-sample), contenant :
+  - Un exemple de jeu Pong (`Assets/Demos/Pong/Pong.unity`)
+  - Un exemple de jeu MetaVerse (`Assets/Demos/MetaVerse/MetaVerse.unity`)
+  - Un exemple de TCP avec C# (`Assets/Demos/TCP/TCP.unity`)
+  - Un exemple d'UDP en C# (`Assets/Demos/UDP/UDP.unity`)
+
+
 
 ## Travail d'équipe
 
-Vous devez travailler en groupe de maximum 4 personnes. Merci de renseigner la constitution de vos groupes ici : 
+Vous devez travailler en groupe de maximum 4 personnes. Merci de renseigner la constitution de vos groupes ici : [https://docs.google.com/spreadsheets/d/1L4JQTXWfbR5OX36EWY5PU2A0mlyUb5ecKjiCXGic-Qk/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1L4JQTXWfbR5OX36EWY5PU2A0mlyUb5ecKjiCXGic-Qk/edit?usp=sharing)
 
 ## Notation
 
-We have asked to create a networked multiplayer game using Unity3D and the C# programming language.
+Nous vous avons demandé de créer un jeu multijoueur en réseau en utilisant Unity3D et le langage de programmation C#.
 
+
+{% hint style="warning" %}
 Le but de ce projet est de développer vos compétences d'ingénieur, votre capacité à concevoir et à exécuter un développement logiciel complexe. Les éléments suivants sont donc considérés comme contraires à l'esprit de l'exercice, et ne seront pas autorisés ou acceptés :
 
-La copie ou l'adaptation, de quelque manière que ce soit, des dépôts de traceurs de rayons existants sur Git-Hub ou ailleurs.
-
-L'utilisation de Chat-GPT, ou d'une autre intelligence artificielle, pour écrire votre code.
+* La copie ou l'adaptation, de quelque manière que ce soit, des dépôts de jeux multi-joueur sur Git-Hub ou ailleurs.
+* L'utilisation de Chat-GPT, ou d'une autre intelligence artificielle, pour écrire votre code.
+* L'utilisation des outils de réseau intégrés à Unity, les plugins ou les packages, ou toute autre extension provenant de l'Asset Store ou d'ailleurs
 
 Je vous demanderai fréquemment d'expliquer votre code, et vous serez pénalisé si vous ne pouvez pas expliquer suffisamment votre structure de données ou vos algorithmes.
+{% endhint %}
 
 **Livraison et livrables**
 
@@ -92,4 +118,38 @@ Vous devrez présenter votre logiciel le vendredi 22 novembre 2024. Vous devrez 
 - vous devez fournir un lien vers le projet GitHub
 
 **Notation**
+
+
+La notation est réalisée _à la carte_. Un produit de base fonctionnel (MVP) vous vaudra une note qui passe. Ensuite, vous êtes libre de mettre en œuvre toutes les techniques que vous souhaitez pour améliorer votre note, jusqu'à un maximum de 20 points.
+
+La grille de notation suivante sera utilisée pour évaluer le projet :
+
+| Aspect                                                              | Note              |
+| ------------------------------------------------------------------- | ----------------- |
+| **Produit de base fonctionnel**                                   |                   |
+| Un exécutable fonctionnel                                       | 1                 |
+| Interaction utilisateur minimal qui fait bouger un objet dans la scene    | 1                 |
+| Envoie de paquet simple vers une autre machine (TCP ou UDP)   | 1                 |
+| Au moins un synchronisation de position d'un en force-brute entre 2 machines     | 3                 |
+| Synchronisation des objets modifiés par des gestes utilisateurs     | 2                 |
+| **Architecture C# et qualité du code**                             |                   |
+| Structures de données                                               | 1                 |
+| Clean code                                                          | 1                 |
+| Algorithmes utilisés et correctement expliqués                      | 1                 |
+| **Points supplémentaires**                                          |                   |
+| Protocol personnalisé de communication                                              | 2                 |
+| Gestion de la phase de connexion initiale (syncronisation du state initial)               | 2                 |
+| Techniques de réduction de latence/band-passante                                             | jusqu'à 8 points                 |
+| Gestion des objets partagés dans la scène (bonus à collectionner)   |  2 |
+| Instantiation d'autres personnages et leur synchronisation        | 4                 |
+| Gestion d'une situation de course (2 joueurs prennent en même temps le même objet)        | 3                 |
+| Phase initial du jeu bien géré (interfaces pour préciser les coordonnées du serveur, connexion, gestion d'erreurs)                       | 2                 |
+| Serveur deployé et jouable sur Internet                              | 3                 |
+| Graphisme supplémentaire (modèles, textures, UI)                     | Max. 2 points                 |
+| Toute autre caractéristique suffisamment expliquée et mise en œuvre | 3                 |
+
+
+Vous pouvez commencer par implémenter une version réseau à 2 joueurs du jeu Pong que j'ai fourni. Cela suffira pour obtenir les 11 premiers points si votre architecture est propre et bien implémentée.
+
+
 

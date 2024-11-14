@@ -1,36 +1,35 @@
 # UDP
 
-UDP, or Uniform Datagram Protocol, is a connectionless, non-reliable protocol that can be used to send high-frequency packets to a destination.
+UDP, ou **Uniform Datagram Protocol**, est un protocole sans connexion et non fiable qui peut être utilisé pour envoyer des paquets à haute fréquence vers une destination.
 
-The idea that each packet (or datagram) is of a relatively small size (max. 65,535 bytes). There is very little overhead, and no additional messages like ACKS.
+L'idée est que chaque paquet (ou datagramme) est d'une taille relativement petite (max. 65 535 octets). Il y a très peu de frais généraux et pas de messages supplémentaires comme ACKS.
 
-This means we will not overburden our network with administrative messages, and can send messages at a high frequency.
+Cela signifie que nous ne surchargerons pas notre réseau avec des messages administratifs et que nous pouvons envoyer des messages à une fréquence élevée.
 
-But be careful ! You may need to manually handle certain situations :
+Mais attention ! Il se peut que vous deviez gérer manuellement certaines situations :
 
-- packets arriving out of order
-- dropped packets (too many packets leaving or entering our network interface)
-- packets not reaching their destination
+- paquets arrivant dans le désordre
+- paquets abandonnés (trop de paquets quittant ou entrant dans notre interface réseau)
+- les paquets qui n'atteignent pas leur destination
 
-It is a compromise between speed and reliability!
+C'est un compromis entre vitesse et fiabilité !
 
-## Setup
+## Configuration
 
-In UDP we do not have the role of server versus client. Both parties will set up a listener on a port for receiving messages. 
+En UDP, il n'y a pas de rôle de serveur par rapport à celui de client. Les deux parties mettront en place un auditeur sur un port pour recevoir des messages. 
 
-Both can also send messages - all that is needed is an IP Address and a Port. 
+Les deux parties peuvent également envoyer des messages - tout ce dont elles ont besoin, c'est d'une adresse IP et d'un port. 
 
-Once the message is sent, there is no follow-up or assurance that the message will arrive at its destination.
+Une fois le message envoyé, il n'y a pas de suivi ou d'assurance que le message arrivera à destination.
+
+En général, lorsqu'un message est reçu, nous obtenons l'adresse IP et le port de l'expéditeur du message (dans le cadre du datagramme UDP). Nous pouvons envoyer une réponse en conséquence.
 
 
-Typically, once a message is received, we will get the IP address and port of the message sender (as part of the UDP datagram). We can send a response accordingly.
+## UDP en C#/dotnet
 
+La bibliothèque `System.Net.Sockets` contient des outils qui encapsulent le protocole UDP pour nous.
 
-## UDP in C#/dotnet
-
-The `System.Net.Sockets` library contains tools that encapsulate the UDP protocol for us.
-
-We can create a UDP listeners and send messages as follows :
+Nous pouvons créer un auditeur UDP et envoyer des messages comme suit :
 
 
 ```c#

@@ -1,28 +1,26 @@
-# Table of contents
+# Table des matières
 
 * [MMP(O)(R)G](README.md)
 
-## Game types
-
-* [Massive player pong](games/pong-massive.md)
-* [My MetaVerse](games/meta-verse.md)
-
-## Networking
+## Mise en réseau
 
 * [Architecture](networking/architecture.md)
 * [Topologies](networking/introduction.md)
 * [La pile TCP/IP](networking/tcp-ip.md)
-* [Routing](networking/routing.md)
+* [Routage](networking/routing.md)
 * [TCP et UDP](networking/transport.md)
 * [TCP Messaging](networking/tcp.md)
-* [UDP Messaging](networking/udp.md)
+* [Messagerie UDP](networking/udp.md)
 
 
-## Unity
+## Unité
 
-* [The basics](unity/basics.md)
-* [Animation loop](unity/loop.md)
-* [Keyboard Input](unity/input.md)
-* [Collision detection](unity/collisions.md)
-* [Instantiation / Deletion](unity/instances.md)
-* [Scene Management](unity/scene.md)
+* [Les bases](unity/basics.md)
+* [Boucle d'animation](unity/loop.md)
+* [Mouvements](unity/movements.md)
+* [Accès aux composants](unity/components.md)
+* [Entrée clavier](unity/input.md)
+* [Détection des collisions](unity/collisions.md)
+* [Instanciation / Suppression](unity/instances.md)
+* [Gestion des scènes](unity/scene.md)
+* [Exportation d'un exécutable](unity/export.md)

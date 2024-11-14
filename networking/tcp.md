@@ -1,38 +1,39 @@
 # TCP
 
-TCP, or Transmission Control Protocol, is a connection-based protocol that ensures message deliverability.
+TCP, ou **Transmission Control Protocol**, est un protocole basé sur la connexion qui garantit la délivrabilité des messages.
 
-The basis of TCP is that "connection" is kept open between two hosts via a number of administrative messages that are sent between them.
+La base du TCP est que la « connexion » est maintenue ouverte entre deux hôtes par le biais d'un certain nombre de messages administratifs qui sont envoyés entre eux.
 
-For example, a connection is establish after an initial handshake between the two machines. Note that they are not physically connected! There is still the internet with all its problems that lies between them !
+Par exemple, une connexion est établie après une **handshake** initiale entre les deux machines. Notez qu'elles ne sont pas physiquement connectées ! Il y a encore l'internet avec tous ses problèmes qui se trouve entre elles !
 
-However, TCP gives the illusion of a connection by regularly sending messages between the two hosts to make sure they are both still reachable. If no message is received after a certain time, TCP assumes that the other host has disconnected.
+Cependant, TCP donne l'illusion d'une connexion en envoyant régulièrement des messages entre les deux hôtes pour s'assurer qu'ils sont toujours joignables. Si aucun message n'est reçu après un certain temps, TCP suppose que l'autre hôte s'est déconnecté.
 
-Another feature of TCP is that it sends messages **reliably** and **in order**, by requiring and acknowledgement of receipt (ACK) of that message, before sending the next one. If an ACK is not receives within a certain time, TCP will retry sending it until an ACK is received, or until a timeout signaling that the host has disappeared.
+Une autre caractéristique du TCP est qu'il envoie des messages de  manière **fiable** et **dans l'ordre**, en exigeant un accusé de réception (ACK) de ce message avant d'envoyer le suivant. Si un ACK n'est pas reçu dans un certain délai, TCP réessaie d'envoyer le message jusqu'à ce qu'un ACK soit reçu, ou jusqu'à ce qu'un timeout signale que l'hôte a disparu.
 
 ![](../graphics/tcp.png)
 
 
 {% hint style="info" %}
 
-All HTTP requests use TCP for the transport layer. When we send a request to a server, a TCP connection is established, and we ensure that the request is sent reliably and in order. The same is true for the response. Once an HTTP request is done, the TCP connection is closed.
+Toutes les requêtes HTTP utilisent TCP comme couche de transport. Lorsque nous envoyons une requête à un serveur, une connexion TCP est établie et nous nous assurons que la requête est envoyée de manière fiable et dans l'ordre. Il en va de même pour la réponse. Une fois la requête HTTP terminée, la connexion TCP est fermée.
 
 {% endhint %}
 
 
-For game development, TCP could be considered to be too costly in terms of bandwidth, and may also introduce extra latency in our synchronisation.
+Pour le développement d'un jeu, TCP pourrait être considéré comme trop coûteux en termes de bande passante, et pourrait également introduire une latence supplémentaire dans notre synchronisation.
 
-Think about it. If we are sending 30 updates per second, is it really serious is we miss one or two ? Do we really want to wait for message X to be sent reliably or should be just skip it and move on ? 
+Pensez-y. Si nous envoyons 30 mises à jour par seconde, est-ce vraiment grave si nous en manquons une ou deux ? Voulons-nous vraiment attendre que le message X soit envoyé de manière fiable ou devrions-nous simplement l'ignorer et passer à autre chose ? 
 
-Do we want to be overloading our network with ACKs for every update being sent?
+Voulons-nous surcharger notre réseau avec des ACK pour chaque mise à jour envoyée ?
 
-Probably not, but is there a different way to send real-time messages without the overhead ? Yes ! UDP.
+Probablement pas, mais existe-t-il un autre moyen d'envoyer des messages en temps réel sans surcharge ? Oui ! UDP.
 
-## TCP in C#/dotnet
 
-The `System.Net.Sockets` library contains tools that encapsulate the TCP protocol for us.
+## TCP en C#/dotnet
 
-We can create a TCP server that listens for incoming connections :
+La bibliothèque `System.Net.Sockets` contient des outils qui encapsulent le protocole TCP pour nous.
+
+Nous pouvons créer un serveur TCP qui écoute les connexions entrantes :
 
 ```c#
 using System.Net;
