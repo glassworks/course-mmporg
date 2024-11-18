@@ -89,7 +89,7 @@ Puisqu'un projet Unity contient beaucoup de médias, je vous conseille d'ajouter
 *.mp3 -delta
 ```
 
-## Opening a project
+## Ouverture d'un projet
 
 
 J'ai fourni un exemple de projet avec plusieurs scènes de démonstration dans ce dépôt [https://github.com/glassworks/course-mmporg-sample](https://github.com/glassworks/course-mmporg-sample).
