@@ -100,7 +100,7 @@ Vous vous sentez un peu perdu, ou vous ne savez pas par où commencer ? Heureuse
 
 ## Travail d'équipe
 
-Vous devez travailler en groupe de maximum 4 personnes. Merci de renseigner la constitution de vos groupes ici : [https://docs.google.com/spreadsheets/d/1L4JQTXWfbR5OX36EWY5PU2A0mlyUb5ecKjiCXGic-Qk/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1L4JQTXWfbR5OX36EWY5PU2A0mlyUb5ecKjiCXGic-Qk/edit?usp=sharing)
+Vous devez travailler en groupe de maximum 4 personnes. Merci de consulter la constitution de vos groupes ici : [https://docs.google.com/spreadsheets/d/1L4JQTXWfbR5OX36EWY5PU2A0mlyUb5ecKjiCXGic-Qk/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1L4JQTXWfbR5OX36EWY5PU2A0mlyUb5ecKjiCXGic-Qk/edit?usp=sharing)
 
 ## Notation
 
