@@ -118,7 +118,7 @@ Je vous demanderai fréquemment d'expliquer votre code, et vous serez pénalisé
 
 **Livraison et livrables**
 
-Vous devrez présenter votre logiciel le vendredi 22 novembre 2024. Vous devrez présenter les éléments suivants :
+Vous devrez présenter votre logiciel le jeudi 12 décembre 2024. Vous devrez présenter les éléments suivants :
 
 * vous devez démontrer que votre jeu fonctionne avec 4 joueurs ou plus.
 * vous devrez présenter et expliquer une partie de votre code
